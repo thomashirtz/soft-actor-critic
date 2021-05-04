@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from contextlib import contextmanager
 
@@ -9,15 +10,26 @@ from typing import Union
 from typing import Optional
 
 
+def get_run_name(algorithm_name: str = 'SAC', *arguments, **keyword_arguments):
+    name = f'{algorithm_name}_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}'
+    if arguments:
+        for argument in arguments:
+            name += f'_{str(argument)}'
+    if keyword_arguments:
+        for argument_name, argument_value in keyword_arguments.items():
+            name += f'_{argument_name}{str(argument_value)}'
+    return name
+
+
 @contextmanager
-def eval_mode(net):  # todo add typing
+def eval_mode(net: nn.Module):
     """Temporarily switch to evaluation mode."""
-    is_train = net.training
+    originally_training = net.training
     try:
         net.eval()
         yield net
     finally:
-        if is_train:
+        if originally_training:
             net.train()
 
 
@@ -39,7 +51,7 @@ def load_model(model: nn.Module, file: Union[str, Path]) -> None:
     model.load_state_dict(torch.load(file))
 
 
-def save_to_writer(writer, tag_to_scalar_value: dict, step: int) -> None:  # todo check if it actually needed
+def save_to_writer(writer, tag_to_scalar_value: dict, step: int) -> None:
     for tag, scalar_value in tag_to_scalar_value.items():
         writer.add_scalar(tag=tag, scalar_value=scalar_value, global_step=step)
 

@@ -6,8 +6,8 @@ from typing import Tuple
 from typing import Optional
 from typing import Sequence
 
-from utilities import weight_initialization
-from utilities import get_multilayer_perceptron
+from soft_actor_critic.utilities import weight_initialization
+from soft_actor_critic.utilities import get_multilayer_perceptron
 
 
 class QNetwork(nn.Module):
