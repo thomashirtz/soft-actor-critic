@@ -10,7 +10,7 @@ from typing import Union
 from typing import Optional
 
 
-def get_run_name(algorithm_name: str = 'SAC', *arguments, **keyword_arguments):
+def get_run_name(algorithm_name: str = 'SAC', *arguments, **keyword_arguments) -> str:
     name = f'{algorithm_name}_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}'
     if arguments:
         for argument in arguments:
@@ -56,6 +56,14 @@ def save_to_writer(writer, tag_to_scalar_value: dict, step: int) -> None:
         writer.add_scalar(tag=tag, scalar_value=scalar_value, global_step=step)
 
 
+def filter_info(dictionary: dict) -> dict:
+    filtered_dictionary = {}
+    for key, value in dictionary.items():
+        if '/' in key and isinstance(value, (int, float)):
+            filtered_dictionary[key] = value
+    return filtered_dictionary
+
+
 def weight_initialization(module) -> None:
     if isinstance(module, nn.Linear):
         torch.nn.init.xavier_uniform_(module.weight, gain=1)
@@ -71,3 +79,9 @@ def get_multilayer_perceptron(unit_list: List[int], keep_last_relu: bool = False
         return nn.Sequential(*module_list)
     else:
         return nn.Sequential(*module_list[:-1])
+
+
+def get_timedelta_formatted(td):
+    hours, rem = divmod(td.seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
+    return f'{hours:02}:{minutes:02}:{seconds:02}'

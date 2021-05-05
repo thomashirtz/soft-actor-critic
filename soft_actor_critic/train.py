@@ -10,15 +10,17 @@ from typing import Sequence
 from torch.utils.tensorboard import SummaryWriter
 
 from soft_actor_critic.agent import Agent
-from soft_actor_critic.utilities import save_to_writer
+from soft_actor_critic.utilities import filter_info
 from soft_actor_critic.utilities import get_run_name
+from soft_actor_critic.utilities import save_to_writer
+from soft_actor_critic.utilities import get_timedelta_formatted
 
 
 def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 256, memory_size: int = 10e6,
           learning_rate: float = 3e-4, alpha: float = 0.05, gamma: float = 0.99, tau: float = 0.005,
           num_steps: int = 1_000_000, hidden_units: Optional[Sequence[int]] = None, load_models: bool = False,
           saving_frequency: int = 20, run_name: Optional[str] = None, start_step: int = 1_000, seed: int = 0,
-          updates_per_step: int = 1, checkpoint_directory: str = '../checkpoints/', flush_print: bool = True):
+          updates_per_step: int = 1, checkpoint_directory: str = '../checkpoints/'):
 
     env_kwargs = env_kwargs or {}
     env = gym.make(env_name, **env_kwargs)
@@ -38,32 +40,35 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
     np.random.seed(seed)
     torch.manual_seed(seed)
 
+    start_training_time = datetime.datetime.now()
+    print(f'Start training time: {start_training_time.strftime("%Y-%m-%d %H:%M:%S")}')
+
     updates = 0
     global_step = 0
+    last_save_step = -1
     score_history = []
 
     for episode in count():
+        info = {}
         score = 0
         done = False
         episode_step = 0
-        last_save_step = -1
+
         observation = env.reset()
 
         while not done:
             if start_step > global_step:
-                action = env.action_space.sample()  # Sample random action
+                action = env.action_space.sample()
             else:
-                action = agent.choose_action(observation)  # Sample action from policy
+                action = agent.choose_action(observation)
 
             new_observation, reward, done, info = env.step(action)
-            episode_step += 1
-            global_step += 1
+            agent.remember(observation, action, reward, new_observation, done)
 
-            _done = 0 if episode_step == env._max_episode_steps else int(done)  # noqa
-            agent.remember(observation, action, reward, new_observation, _done)
-
-            observation = new_observation
             score += reward
+            global_step += 1
+            episode_step += 1
+            observation = new_observation
 
             if agent.memory.memory_counter >= batch_size:
                 for update in range(updates_per_step):
@@ -73,13 +78,16 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
 
         score_history.append(score)
         average_score = np.mean(score_history[-100:])
-        print(f'\repisode {episode} \tepisode_step {episode_step} \tglobal_step {global_step} \tscore {score:.3f} '
-              f'\ttrailing 100 games avg {average_score:.3f} \t last_save_step {last_save_step}', end="", flush=True)
+        time_delta = get_timedelta_formatted(datetime.datetime.now() - start_training_time)
+        print(f'\r{time_delta}   [{global_step}/{num_steps}]   Episode n°{episode}   '
+              f'Steps: {episode_step} \tScore: {score:.3f} \tAverage100: {average_score:.3f} \t'
+              f'(Last save: {last_save_step})', end="", flush=True)
 
         tensorboard_logs = {
             'train/episode_step': episode_step,
             'train/score': score,
-            'train/average_score': average_score
+            'train/average_score': average_score,
+            **filter_info(info)
         }
         save_to_writer(writer, tensorboard_logs, global_step)
 
@@ -89,6 +97,3 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
 
         if global_step > num_steps:
             break
-
-
-

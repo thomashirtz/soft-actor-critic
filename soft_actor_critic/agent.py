@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # noqa Remove 'Successfully opened dynamic library' tensorflow warning
+
 import numpy as np
 from pathlib import Path
 from pathlib import PurePath
@@ -5,10 +8,11 @@ from pathlib import PurePath
 from typing import Optional
 from typing import Sequence
 from typing import Union
+from typing import Tuple
 
 import torch
 import torch.optim as optim
-import torch.nn.functional as F
+import torch.nn.functional as F  # noqa : N812
 
 from soft_actor_critic.memory import ReplayBuffer
 from soft_actor_critic.critic import TwinnedQNetworks
@@ -27,7 +31,6 @@ class Agent:
                  hidden_units: Optional[Sequence[int]] = None, load_models: bool = False,
                  checkpoint_directory: Optional[Union[Path, str]] = None):
 
-        self.alpha = alpha
         self.tau = tau
         self.gamma = gamma
         self.learning_rate = learning_rate
@@ -55,7 +58,8 @@ class Agent:
 
         update_network_parameters(self.critic, self.target_critic, tau=1)
 
-        self.target_entropy = -torch.Tensor([num_actions]).to(self.device).item()  # todo change to prod
+        self.alpha = torch.Tensor([alpha]).to(self.device)
+        self.target_entropy = -torch.Tensor([num_actions]).to(self.device).item()
         self.log_alpha = torch.zeros(1, requires_grad=True, device=self.device)
         self.alpha_optimizer = optim.Adam([self.log_alpha], lr=learning_rate)
 
@@ -73,16 +77,15 @@ class Agent:
                 load_model(self.policy, self.policy_checkpoint_path)
                 load_model(self.critic, self.critic_checkpoint_path)
 
-    def choose_action(self, observation, evaluate: bool = False) -> np.array:
-        with eval_mode(self.policy), torch.no_grad():
-            observation = torch.FloatTensor(observation).to(self.device).unsqueeze(0)
-            action, _ = self.policy.evaluate(observation, deterministic=evaluate, with_log_probability=False)
-        return action.cpu().detach().numpy()[0]
+    def choose_action(self, observation, deterministically: bool = False) -> np.array:
+        observation = torch.FloatTensor(observation).to(self.device)
+        action = self.policy.act(observation, deterministic=deterministically)
+        return action
 
-    def remember(self, state, action, reward, new_state, done):
+    def remember(self, state, action, reward, new_state, done) -> None:
         self.memory.store_transition(state, action, reward, new_state, done)
 
-    def learn(self):  # todo split into different methods, optimize alpha, optimize critic, optimize policy etc
+    def learn(self) -> dict:
         state, action, reward, next_state, done = self.memory.sample_buffer(self.batch_size)
 
         state = torch.FloatTensor(state).to(self.device)
@@ -91,7 +94,23 @@ class Agent:
         next_state = torch.FloatTensor(next_state).to(self.device)
         done = torch.FloatTensor(done).to(self.device).unsqueeze(1)
 
-        # Critic Improvement
+        critic_1_loss, critic_2_loss = self._critic_optimization(state, action, reward, next_state, done)
+        policy_loss = self._policy_optimization(state)
+        alpha_loss = self._entropy_optimization(state)
+
+        update_network_parameters(self.critic, self.target_critic, self.tau)
+
+        tensorboard_logs = {
+            'loss/critic_1': critic_1_loss,
+            'loss/critic_2': critic_2_loss,
+            'loss/policy': policy_loss,
+            'loss/entropy_loss': alpha_loss,
+            'miscellaneous/alpha': self.alpha.clone().item(),
+        }
+        return tensorboard_logs
+
+    def _critic_optimization(self, state: torch.Tensor, action: torch.Tensor, reward: torch.Tensor,
+                             next_state: torch.Tensor, done: torch.Tensor) -> Tuple[float, float]:
         with torch.no_grad():
             next_action, next_log_pi = self.policy.evaluate(next_state)
             next_q_target_1, next_q_target_2 = self.target_critic.forward(next_state, next_action)
@@ -99,45 +118,40 @@ class Agent:
             next_q = reward + (1 - done) * self.gamma * (min_next_q_target - self.alpha * next_log_pi)
 
         q_1, q_2 = self.critic.forward(state, action)
-        q_1_loss = F.mse_loss(q_1, next_q)
-        q_2_loss = F.mse_loss(q_2, next_q)
-        q_loss = (q_1_loss + q_2_loss) / 2
+        q_network_1_loss = F.mse_loss(q_1, next_q)
+        q_network_2_loss = F.mse_loss(q_2, next_q)
+        q_loss = (q_network_1_loss + q_network_2_loss) / 2
 
         self.critic_optimizer.zero_grad()
         q_loss.backward()
         self.critic_optimizer.step()
 
-        with eval_mode(self.policy):
-            # Policy improvement
-            pi, log_pi = self.policy.evaluate(state)  # todo maybe add logpi to logging
-            pi_q_1, pi_q_2 = self.critic(state, pi)  # todo double check not mean but samples
-            min_pi_q = torch.min(pi_q_1, pi_q_2)  # todo alpha is computed before the policy loss
+        return q_network_1_loss.item(), q_network_2_loss.item()
 
-            policy_loss = ((self.alpha * log_pi) - min_pi_q).mean()
+    def _policy_optimization(self, state: torch.Tensor) -> float:
+        with eval_mode(self.critic):
+            predicted_action, log_probabilities = self.policy.evaluate(state)
+            q_1, q_2 = self.critic(state, predicted_action)
+            min_q = torch.min(q_1, q_2)
+
+            policy_loss = ((self.alpha * log_probabilities) - min_q).mean()
 
             self.policy_optimizer.zero_grad()
             policy_loss.backward()
             self.policy_optimizer.step()
+            return policy_loss.item()
 
-        # Temperature
-        alpha_loss = -(self.log_alpha * (log_pi + self.target_entropy).detach()).mean()
+    def _entropy_optimization(self, state: torch.Tensor) -> float:
+        with eval_mode(self.policy):
+            _, log_pi = self.policy.evaluate(state)
+            alpha_loss = -(self.log_alpha * (log_pi + self.target_entropy).detach()).mean()
 
-        self.alpha_optimizer.zero_grad()
-        alpha_loss.backward()
-        self.alpha_optimizer.step()
+            self.alpha_optimizer.zero_grad()
+            alpha_loss.backward()
+            self.alpha_optimizer.step()
 
-        self.alpha = self.log_alpha.exp()
-
-        update_network_parameters(self.critic, self.target_critic, self.tau)
-
-        tensorboard_logs = {
-            'loss/critic_1': q_1_loss.item(),
-            'loss/critic_2': q_2_loss.item(),
-            'loss/policy': policy_loss.item(),
-            'loss/entropy_loss': alpha_loss.item(),
-            'entropy_temperature/alpha': self.alpha.clone().item(),
-        }
-        return tensorboard_logs
+            self.alpha = self.log_alpha.exp()
+            return alpha_loss.item()
 
     def save_models(self):
         try:
