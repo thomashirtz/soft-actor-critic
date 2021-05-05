@@ -1,10 +1,11 @@
 import numpy as np
 
+from typing import Tuple
 from typing import Union
 from typing import Sequence
 
 
-class ReplayBuffer:
+class ReplayBuffer:  # todo maybe do more clean in the future
     def __init__(self, max_size: int, input_shape: Union[Sequence[int], int], num_actions: int):
         self.memory_counter = 0
         self.memory_size = int(max_size)
@@ -15,7 +16,7 @@ class ReplayBuffer:
         self.new_state_memory = np.zeros((self.memory_size, input_shape))
         self.done_memory = np.zeros(self.memory_size, dtype=np.float32)
 
-    def store_transition(self, state, action, reward, new_state, done):
+    def store_transition(self, state: Union[list, np.array], action, reward: float, new_state: Union[list, np.array], done: Union[int, bool]):
         index = self.memory_counter % self.memory_size
 
         self.state_memory[index] = state
@@ -26,7 +27,7 @@ class ReplayBuffer:
 
         self.memory_counter += 1
 
-    def sample_buffer(self, batch_size):
+    def sample_buffer(self, batch_size: int) -> Tuple[np.array, np.array, np.array, np.array, np.array]:
         max_mem = min(self.memory_counter, self.memory_size)
 
         batch = np.random.choice(max_mem, batch_size)

@@ -76,7 +76,7 @@ class StochasticPolicy(nn.Module):
 
         return action, log_probability
 
-    def act(self, observation, deterministic=False):  # todo need to replace in the agent code
+    def act(self, observation, deterministic=False) -> np.array:  # todo need to replace in the agent code
         with torch.no_grad():
             action, _ = self.evaluate(observation, deterministic=deterministic, with_log_probability=False)
-            return action.numpy()
+            return action.cpu().numpy()
