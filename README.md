@@ -66,17 +66,32 @@ def _entropy_optimization(self, state: torch.Tensor) -> float:
 
 ## Help
 
-(todo add automamtic update of help)
-```bash
+```
+PyTorch Soft Actor-Critic
 
+optional arguments:
+  -h, --help                show this help message and exit
+  --env-name                Gym environment to train on (default: LunarLanderContinuous-v2)
+  --batch-size              Batch size used by the agent during the learning phase (default: 256)
+  --memory-size             Size of the replay buffer (default: 1000000)
+  --learning-rate           Learning rate used for the optimization of the temperature and the networks (default: 0.0003)
+  --gamma                   Discount rate used by the agent (default: 0.99)
+  --tau                     Value used for the progressive update of the target networks (default: 0.005)
+  --num-steps               Number of steps in the training process (default: 1000000)
+  --run-name                Name used for saving the weights and the logs (default: generated using the "get_run_name" function)
+  --start-step              Step after which the agent starts to learn (default: 1000)
+  --hidden-units  [ ...]    List of hidden units (default: [256, 256])
+  --checkpoint-directory    Root directory in which the run folder will be created (default: ../checkpoints/)
+  --seed                    Seed used for the run (default: 1)
+  --alpha                   Starting temperature (default: 0.2)
 ```
 
 ## Resources
 
 List of repository that helped me to solve technical issues:
-- [pytorch-soft-actor-critic](https://github.com/pranz24/pytorch-soft-actor-critic) made by [pranz24](https://github.com/pranz24)
-- [Soft-Actor-Critic-and-Extensions](https://github.com/BY571/Soft-Actor-Critic-and-Extensions) made by [BY571](https://github.com/BY571)
-- [spinningup](https://github.com/openai/spinningup) from [openai](https://github.com/openai)
+- [pytorch-soft-actor-critic](https://github.com/pranz24/pytorch-soft-actor-critic) 
+- [Soft-Actor-Critic-and-Extensions](https://github.com/BY571/Soft-Actor-Critic-and-Extensions) 
+- [spinningup](https://github.com/openai/spinningup) 
 
 ## Original papers:
 
