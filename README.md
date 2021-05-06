@@ -8,27 +8,88 @@ as possible on purpose.
 ```
 PyTorch Soft Actor-Critic
 
+positional arguments:
+  {train,eval}  Desired action to perform
+    train       Create something
+    eval        Update something
+
 optional arguments:
-  -h, --help                show this help message and exit
-  --env-name                Gym environment to train on (default: LunarLanderContinuous-v2)
-  --batch-size              Batch size used by the agent during the learning phase (default: 256)
-  --memory-size             Size of the replay buffer (default: 1000000)
-  --learning-rate           Learning rate used for the optimization of the temperature and the networks (default: 0.0003)
-  --gamma                   Discount rate used by the agent (default: 0.99)
-  --tau                     Value used for the progressive update of the target networks (default: 0.005)
-  --num-steps               Number of steps in the training process (default: 1000000)
-  --run-name                Name used for saving the weights and the logs (default: generated using the "get_run_name" function)
-  --start-step              Step after which the agent starts to learn (default: 1000)
-  --hidden-units  [ ...]    List of hidden units (default: [256, 256])
-  --checkpoint-directory    Root directory in which the run folder will be created (default: ../checkpoints/)
-  --seed                    Seed used for the run (default: 1)
-  --alpha                   Starting temperature (default: 0.2)
+  -h, --help    show this help message and exit
 ```
+
+### Train help
+
+```
+usage: use "python __main__.py --help" for more information train [-h] [--env-name] [--seed] [--hidden-units  [...]] [--checkpoint-directory] [--run-name]
+                                                                  [--batch-size] [--memory-size] [--learning-rate] [--gamma] [--tau] [--num-steps]
+                                                                  [--start-step] [--alpha]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --env-name            Gym environment to train on (default: LunarLanderContinuous-v2)
+  --seed                Seed used for the run (default: 1)
+  --hidden-units  [ ...]
+                        List of hidden units (default: [256, 256])
+  --checkpoint-directory
+                        Root directory in which the run folder will be created (default: ../checkpoints/)
+  --run-name            Name used for saving the weights and the logs (default: generated using the "get_run_name" function)
+  --batch-size          Batch size used by the agent during the learning phase (default: 256)
+  --memory-size         Size of the replay buffer (default: 1000000)
+  --learning-rate       Learning rate used for the optimization of the temperature and the networks (default: 0.0003)
+  --gamma               Discount rate used by the agent (default: 0.99)
+  --tau                 Value used for the progressive update of the target networks (default: 0.005)
+  --num-steps           Number of steps in the training process (default: 1000000)
+  --start-step          Step after which the agent starts to learn (default: 1000)
+  --alpha               Starting temperature (default: 0.2)
+```
+
+### Evaluate help
+
+```
+usage: use "python __main__.py --help" for more information eval [-h] [--env-name] [--seed] [--hidden-units  [...]] [--checkpoint-directory] [--run-name]
+                                                                 [--num-episodes] [--deterministic]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --env-name            Gym environment to train on (default: LunarLanderContinuous-v2)
+  --seed                Seed used for the run (default: 1)
+  --hidden-units  [ ...]
+                        List of hidden units (default: [256, 256])
+  --checkpoint-directory
+                        Root directory in which the run folder will be created (default: ../checkpoints/)
+  --run-name            Name used for saving the weights and the logs (default: generated using the "get_run_name" function)
+  --num-episodes        Number of steps in the training process (default: 10)
+  --deterministic       Toggle the rendering of the episodes
+```
+
+## Usage
+
+### Train
+
+```bash
+python3 soft_actor_critic train
+```
+
+With some arguments:
+```bash
+python3 soft_actor_critic train --env-name MountainCarContinuous-v0 --learning-rate 0.001
+```
+
+### Eval
+
+```bash
+python3 soft_actor_critic eval --run-name name_of_my_last_run
+```
+
+With some arguments:
+```bash
+python3 soft_actor_critic eval --run-name name_of_my_last_run --hidden-units 512 512 --seed 2
+```
+(The environment name, and the hidden units need to correspond to the arguments in the run that is loaded)
 
 ## Equations
 
 This is an attempt to show the equation of the paper, and their correspondence in the source code:
-(todo automatic update of the code in the readme)
 
 ### Critic network Optimization
 
