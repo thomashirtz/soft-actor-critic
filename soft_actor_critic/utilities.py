@@ -44,11 +44,17 @@ def update_network_parameters(source: nn.Module, target: nn.Module, tau: float) 
 
 
 def save_model(model: nn.Module, file: Union[str, Path]) -> None:
-    torch.save(model.state_dict(), file)
+    try:
+        torch.save(model.state_dict(), file)
+    except FileNotFoundError:
+        print('Unable to save the models')
 
 
 def load_model(model: nn.Module, file: Union[str, Path]) -> None:
-    model.load_state_dict(torch.load(file))
+    try:
+        model.load_state_dict(torch.load(file))
+    except FileNotFoundError:
+        print('Unable to load the models')
 
 
 def save_to_writer(writer, tag_to_scalar_value: dict, step: int) -> None:
