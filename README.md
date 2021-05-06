@@ -3,6 +3,32 @@
 Implementation of the soft actor critic algorithm using Pytorch. Code kept as lean and clean
 as possible on purpose.
 
+## Usage
+
+### Train
+
+```
+python3 soft_actor_critic train
+```
+
+With some arguments:
+```
+python3 soft_actor_critic train --env-name MountainCarContinuous-v0 --learning-rate 0.001
+```
+
+### Eval
+
+```
+python3 soft_actor_critic eval --run-name name_of_my_last_run
+```
+
+With some arguments:
+```
+python3 soft_actor_critic eval --run-name name_of_my_last_run --hidden-units 512 512 --seed 2
+```
+(The environment name, and the hidden units need to correspond to the arguments in the run that is loaded)
+
+
 ## Help
 
 ```
@@ -62,30 +88,6 @@ optional arguments:
   --deterministic       Toggle the rendering of the episodes
 ```
 
-## Usage
-
-### Train
-
-```bash
-python3 soft_actor_critic train
-```
-
-With some arguments:
-```bash
-python3 soft_actor_critic train --env-name MountainCarContinuous-v0 --learning-rate 0.001
-```
-
-### Eval
-
-```bash
-python3 soft_actor_critic eval --run-name name_of_my_last_run
-```
-
-With some arguments:
-```bash
-python3 soft_actor_critic eval --run-name name_of_my_last_run --hidden-units 512 512 --seed 2
-```
-(The environment name, and the hidden units need to correspond to the arguments in the run that is loaded)
 
 ## Equations
 
