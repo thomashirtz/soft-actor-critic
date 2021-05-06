@@ -29,7 +29,7 @@ class Agent:
     def __init__(self, observation_shape: int, num_actions: int, batch_size: int = 256, memory_size: int = 10e6,
                  learning_rate: float = 3e-4, alpha: float = 1, gamma: float = 0.99, tau: float = 0.005,
                  hidden_units: Optional[Sequence[int]] = None, load_models: bool = False,
-                 checkpoint_directory: Optional[Union[Path, str]] = None):
+                 checkpoint_directory: Optional[Union[Path, str]] = None):  # todo implement hard update
 
         self.tau = tau
         self.gamma = gamma
@@ -125,7 +125,6 @@ class Agent:
         self.critic_optimizer.zero_grad()
         q_loss.backward()
         self.critic_optimizer.step()
-
         return q_network_1_loss.item(), q_network_2_loss.item()
 
     def _policy_optimization(self, state: torch.Tensor) -> float:
@@ -154,15 +153,9 @@ class Agent:
             return alpha_loss.item()
 
     def save_models(self):
-        try:
-            save_model(self.policy, self.policy_checkpoint_path)
-            save_model(self.critic, self.critic_checkpoint_path)
-        except Exception:
-            print("Unable to save the models")
+        save_model(self.policy, self.policy_checkpoint_path)
+        save_model(self.critic, self.critic_checkpoint_path)
 
     def load_models(self):
-        try:
-            save_model(self.policy, self.policy_checkpoint_path)
-            save_model(self.critic, self.critic_checkpoint_path)
-        except Exception:
-            print("Unable to load the models")
+        save_model(self.policy, self.policy_checkpoint_path)
+        save_model(self.critic, self.critic_checkpoint_path)

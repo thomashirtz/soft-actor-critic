@@ -20,17 +20,18 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
           learning_rate: float = 3e-4, alpha: float = 0.05, gamma: float = 0.99, tau: float = 0.005,
           num_steps: int = 1_000_000, hidden_units: Optional[Sequence[int]] = None, load_models: bool = False,
           saving_frequency: int = 20, run_name: Optional[str] = None, start_step: int = 1_000, seed: int = 0,
-          updates_per_step: int = 1, checkpoint_directory: str = '../checkpoints/', **kwargs):
+          updates_per_step: int = 1, directory: str = '../runs/', **kwargs):
 
-    print(f'Unrecognized kwargs : {kwargs}')
+    if kwargs:
+        print(f'Unrecognized kwargs : {kwargs}')
 
     env_kwargs = env_kwargs or {}
     env = gym.make(env_name, **env_kwargs)
-    observation_shape = env.observation_space.shape[0]
+    observation_shape = env.observation_space.shape[0]  # todo learn how to handle 2D observations
     num_actions = env.action_space.shape[0]
 
-    run_name = run_name if run_name is not None else get_run_name('SAC', env_name, lr=learning_rate)
-    run_directory = Path(checkpoint_directory) / run_name
+    run_name = run_name if run_name is not None else get_run_name(env_name)
+    run_directory = Path(directory) / run_name
     writer = SummaryWriter(run_directory)
 
     agent = Agent(observation_shape=observation_shape, num_actions=num_actions,
@@ -47,7 +48,7 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
 
     updates = 0
     global_step = 0
-    last_save_step = -1
+    last_save_episode = -1
     score_history = []
 
     for episode in count():
@@ -83,7 +84,7 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
         time_delta = get_timedelta_formatted(datetime.datetime.now() - start_training_time)
         print(f'\r{time_delta}   [{global_step}/{num_steps}]   Episode n°{episode}   '
               f'Steps: {episode_step} \tScore: {score:.3f} \tAverage100: {average_score:.3f} \t'
-              f'(Last save: {last_save_step})', end="", flush=True)
+              f'(Last save: Episode n°{last_save_episode})', end="", flush=True)
 
         tensorboard_logs = {
             'train/episode_step': episode_step,
@@ -94,7 +95,7 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
         save_to_writer(writer, tensorboard_logs, global_step)
 
         if episode % saving_frequency == 0:
-            last_save_step = global_step
+            last_save_episode = episode
             agent.save_models()
 
         if global_step > num_steps:
