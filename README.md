@@ -1,7 +1,7 @@
 # soft-actor-critic
 
 Implementation of the soft actor critic algorithm using Pytorch. Code kept as lean and clean
-as possible on purpose.
+as possible on purpose. <img align="right" width="350"  src="lunar_lander.gif"> 
 
 ## Usage
 
@@ -32,12 +32,16 @@ python3 soft_actor_critic eval --run-name name_of_my_last_run --hidden-units 512
 ## Help
 
 ```
+python soft_actor_critic --help
+
+usage: Use "python soft_actor_critic --help" for more information
+
 PyTorch Soft Actor-Critic
 
 positional arguments:
-  {train,eval}  Desired action to perform
+  {train,eval}  Selection of the mode to perform
     train       Create something
-    eval        Update something
+    eval        Evaluate the performance of an already trained agent
 
 optional arguments:
   -h, --help    show this help message and exit
@@ -46,46 +50,55 @@ optional arguments:
 ### Train help
 
 ```
-usage: use "python __main__.py --help" for more information train [-h] [--env-name] [--seed] [--hidden-units  [...]] [--checkpoint-directory] [--run-name]
-                                                                  [--batch-size] [--memory-size] [--learning-rate] [--gamma] [--tau] [--num-steps]
-                                                                  [--start-step] [--alpha]
+python soft_actor_critic train --help
+
+usage: Use "python soft_actor_critic --help" for more information train [-h] [--env-name] [--hidden-units  [...]]
+                                                                        [--directory] [--seed] [--run-name]
+                                                                        [--batch-size] [--memory-size]
+                                                                        [--learning-rate] [--gamma] [--tau]
+                                                                        [--num-steps] [--start-step] [--alpha]
 
 optional arguments:
   -h, --help            show this help message and exit
   --env-name            Gym environment to train on (default: LunarLanderContinuous-v2)
-  --seed                Seed used for the run (default: 1)
   --hidden-units  [ ...]
-                        List of hidden units (default: [256, 256])
-  --checkpoint-directory
-                        Root directory in which the run folder will be created (default: ../checkpoints/)
-  --run-name            Name used for saving the weights and the logs (default: generated using the "get_run_name" function)
+                        List of networks' hidden units (default: [256, 256])
+  --directory           Root directory in which the run folder will be created (default: ../runs/)
+  --seed                Seed used for pytorch, numpy and the environment (default: 1)
+  --run-name            Name used for saving the weights and the logs (default: generated using the "get_run_name"
+                        function)
   --batch-size          Batch size used by the agent during the learning phase (default: 256)
   --memory-size         Size of the replay buffer (default: 1000000)
-  --learning-rate       Learning rate used for the optimization of the temperature and the networks (default: 0.0003)
+  --learning-rate       Learning rate used for the networks and entropy optimization (default: 0.0003)
   --gamma               Discount rate used by the agent (default: 0.99)
   --tau                 Value used for the progressive update of the target networks (default: 0.005)
-  --num-steps           Number of steps in the training process (default: 1000000)
+  --num-steps           Number training steps (default: 1000000)
   --start-step          Step after which the agent starts to learn (default: 1000)
-  --alpha               Starting temperature (default: 0.2)
+  --alpha               Starting value of the entropy (alpha) (default: 0.2)
 ```
 
 ### Evaluate help
 
 ```
-usage: use "python __main__.py --help" for more information eval [-h] [--env-name] [--seed] [--hidden-units  [...]] [--checkpoint-directory] [--run-name]
-                                                                 [--num-episodes] [--deterministic]
+python soft_actor_critic eval --help
+
+usage: Use "python soft_actor_critic --help" for more information eval [-h] [--env-name] [--hidden-units  [...]]
+                                                                       [--directory] [--seed] [--run-name]
+                                                                       [--num-episodes] [--deterministic] [--render]
+                                                                       [--record]
 
 optional arguments:
   -h, --help            show this help message and exit
   --env-name            Gym environment to train on (default: LunarLanderContinuous-v2)
-  --seed                Seed used for the run (default: 1)
   --hidden-units  [ ...]
-                        List of hidden units (default: [256, 256])
-  --checkpoint-directory
-                        Root directory in which the run folder will be created (default: ../checkpoints/)
-  --run-name            Name used for saving the weights and the logs (default: generated using the "get_run_name" function)
-  --num-episodes        Number of steps in the training process (default: 10)
-  --deterministic       Toggle the rendering of the episodes
+                        List of networks' hidden units (default: [256, 256])
+  --directory           Root directory in which the run folder will be created (default: ../runs/)
+  --seed                Seed used for pytorch, numpy and the environment (default: 1)
+  --run-name            Run name of an already trained agent located in the "--directory" directory
+  --num-episodes        Number of episodes to run (default: 3)
+  --deterministic       Toggle deterministic behavior of the agent when interacting with the environment
+  --render              Toggle the rendering of the episodes
+  --record              Toggle the recording of the episodes (toggling "record" would also toggle "render")
 ```
 
 
@@ -112,8 +125,8 @@ def _critic_optimization(self, state: torch.Tensor, action: torch.Tensor, reward
     self.critic_optimizer.zero_grad()
     q_loss.backward()
     self.critic_optimizer.step()
-
     return q_network_1_loss.item(), q_network_2_loss.item()
+
 ```
 
 ### Policy Optimization 
@@ -131,6 +144,7 @@ def _policy_optimization(self, state: torch.Tensor) -> float:
         policy_loss.backward()
         self.policy_optimizer.step()
         return policy_loss.item()
+
 ```
 
 ### Entropy Optimization 
@@ -147,6 +161,7 @@ def _entropy_optimization(self, state: torch.Tensor) -> float:
 
         self.alpha = self.log_alpha.exp()
         return alpha_loss.item()
+
 ```
 
 
