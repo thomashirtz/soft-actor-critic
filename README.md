@@ -1,7 +1,7 @@
 # soft-actor-critic
-
+<img align="right" width="350"  src="lunar_lander.gif"> 
 Implementation of the soft actor critic algorithm using Pytorch. Code kept as lean and clean
-as possible on purpose. <img align="right" width="350"  src="lunar_lander.gif"> 
+as possible on purpose. 
 
 ## Usage
 
