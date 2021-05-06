@@ -20,7 +20,9 @@ def train(env_name: str, env_kwargs: Optional[dict] = None, batch_size: int = 25
           learning_rate: float = 3e-4, alpha: float = 0.05, gamma: float = 0.99, tau: float = 0.005,
           num_steps: int = 1_000_000, hidden_units: Optional[Sequence[int]] = None, load_models: bool = False,
           saving_frequency: int = 20, run_name: Optional[str] = None, start_step: int = 1_000, seed: int = 0,
-          updates_per_step: int = 1, checkpoint_directory: str = '../checkpoints/'):
+          updates_per_step: int = 1, checkpoint_directory: str = '../checkpoints/', **kwargs):
+
+    print(f'Unrecognized kwargs : {kwargs}')
 
     env_kwargs = env_kwargs or {}
     env = gym.make(env_name, **env_kwargs)

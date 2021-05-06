@@ -10,8 +10,10 @@ from soft_actor_critic.agent import Agent
 
 def evaluate(env_name: str, run_name: str, env_kwargs: Optional[dict] = None, num_episodes: int = 100, seed: int = 0,
              hidden_units: Optional[Sequence[int]] = None, checkpoint_directory: str = '../checkpoints/',
-             deterministic: bool = False):
+             deterministic: bool = False, **kwargs):
 
+    print(f'Unrecognized kwargs : {kwargs}')
+    
     env_kwargs = env_kwargs or {}
     env = gym.make(env_name, **env_kwargs)
     observation_shape = env.observation_space.shape[0]
@@ -44,4 +46,3 @@ def evaluate(env_name: str, run_name: str, env_kwargs: Optional[dict] = None, nu
 
         score_history.append(score)
         print(f'\rEpisode n°{episode}  Steps: {episode_step} \tScore: {score:.3f} \tMean: {np.mean(score_history):.3f}')
-
