@@ -7,12 +7,12 @@ from soft_actor_critic.evaluate import evaluate
 def get_parser(formatter_class=argparse.RawTextHelpFormatter):
     parser = argparse.ArgumentParser(
         description='PyTorch Soft Actor-Critic',
-        usage='use "python %(prog)s --help" for more information',
+        usage='Use "python soft_actor_critic --help" for more information',
         formatter_class=formatter_class
     )
 
     # choice of the subparser
-    subparsers = parser.add_subparsers(help='Desired action to perform', dest='mode')
+    subparsers = parser.add_subparsers(help='Selection of the mode to perform', dest='mode')
 
     # parent parser
     parent_parser = argparse.ArgumentParser(add_help=False)
@@ -21,16 +21,16 @@ def get_parser(formatter_class=argparse.RawTextHelpFormatter):
         help='Gym environment to train on (default: %(default)s)'
     )
     parent_parser.add_argument(
-        '--seed', default=1, type=int, metavar='',
-        help='Seed used for the run (default: %(default)s)'
-    )
-    parent_parser.add_argument(
         '--hidden-units', nargs='+', type=int, default=[256, 256], metavar='',
-        help='List of hidden units (default: %(default)s)'
+        help='List of networks\' hidden units (default: %(default)s)'
     )
     parent_parser.add_argument(
-        '--checkpoint-directory', default='../checkpoints/', type=str, metavar='',
+        '--directory', default='../runs/', type=str, metavar='',
         help='Root directory in which the run folder will be created (default: %(default)s)'
+    )
+    parent_parser.add_argument(
+        '--seed', default=1, type=int, metavar='',
+        help='Seed used for pytorch, numpy and the environment (default: %(default)s)'
     )
 
     # train parser
@@ -52,7 +52,7 @@ def get_parser(formatter_class=argparse.RawTextHelpFormatter):
     )
     parser_train.add_argument(
         '--learning-rate', default=3e-4, type=float, metavar='',
-        help='Learning rate used for the optimization of the temperature and the networks (default: %(default)s)'
+        help='Learning rate used for the networks and entropy optimization (default: %(default)s)'
     )
     parser_train.add_argument(
         '--gamma', default=0.99, type=float, metavar='',
@@ -64,7 +64,7 @@ def get_parser(formatter_class=argparse.RawTextHelpFormatter):
     )
     parser_train.add_argument(
         '--num-steps', default=1_000_000, type=int, metavar='',
-        help='Number of steps in the training process (default: %(default)s)'
+        help='Number training steps (default: %(default)s)'
     )
     parser_train.add_argument(
         '--start-step', default=1_000, type=int, metavar='',
@@ -72,35 +72,34 @@ def get_parser(formatter_class=argparse.RawTextHelpFormatter):
     )
     parser_train.add_argument(
         '--alpha', default=0.2, type=float, metavar='',
-        help='Starting temperature (default: %(default)s)'
+        help='Starting value of the entropy (alpha) (default: %(default)s)'
     )
 
     # eval parser
     parser_eval = subparsers.add_parser(
         "eval", parents=[parent_parser],
-        help='Update something'
+        help='Evaluate the performance of an already trained agent'
     )
     parser_eval.add_argument(
         '--run-name', type=str, metavar='',
-        help='Name used for saving the weights and the logs (default: generated using the "get_run_name" function)'
+        help='Run name of an already trained agent located in the "--directory" directory'
     )
     parser_eval.add_argument(
-        '--num-episodes', default=10, type=int, metavar='',
-        help='Number of steps in the training process (default: %(default)s)'
+        '--num-episodes', default=3, type=int, metavar='',
+        help='Number of episodes to run (default: %(default)s)'
     )
     parser_eval.add_argument(
-        '--deterministic', default=False, type=bool, metavar='',
+        '--deterministic', default=False, action='store_true',
+        help='Toggle deterministic behavior of the agent when interacting with the environment'
+    )
+    parser_eval.add_argument(
+        '--render', default=False, action='store_true',
         help='Toggle the rendering of the episodes'
     )
-    # parser_eval.add_argument(  # todo implement render and save-render
-    #     '--render', default=False, type=bool, metavar='',
-    #     help='Toggle the rendering of the episodes'
-    # )
-
-    # If top-level args are needed
-    # parser.add_argument('--verbose', help='Common top-level parameter',
-    #                     action='store_true', required=False)
-
+    parser_eval.add_argument(
+        '--record', default=False, action='store_true',
+        help='Toggle the recording of the episodes (toggling "record" would also toggle "render")'
+    )
     return parser
 
 
@@ -124,4 +123,4 @@ if __name__ == '__main__':
         parser.error('The --run-name argument is required in eval mode')
     kwargs = vars(arguments)
     mode = kwargs.pop('mode', 'train')
-    exit(main(mode, **kwargs))
+    exit(main(mode, **kwargs))  # todo fix not implemented error
