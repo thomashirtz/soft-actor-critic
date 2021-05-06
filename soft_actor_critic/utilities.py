@@ -10,8 +10,8 @@ from typing import Union
 from typing import Optional
 
 
-def get_run_name(algorithm_name: str = 'SAC', *arguments, **keyword_arguments) -> str:
-    name = f'{algorithm_name}_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}'
+def get_run_name(*arguments, **keyword_arguments) -> str:
+    name = f'{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}'
     if arguments:
         for argument in arguments:
             name += f'_{str(argument)}'
