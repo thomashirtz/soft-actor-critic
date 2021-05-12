@@ -42,7 +42,7 @@ PyTorch Soft Actor-Critic
 
 positional arguments:
   {train,eval}  Selection of the mode to perform
-    train       Create something
+    train       Train an agent
     eval        Evaluate the performance of an already trained agent
 
 optional arguments:
