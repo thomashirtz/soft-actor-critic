@@ -1,3 +1,4 @@
+import sys
 import argparse
 
 from soft_actor_critic.train import train
@@ -119,8 +120,11 @@ def main(mode, **kwargs):
 if __name__ == '__main__':
     parser = get_parser()
     arguments = parser.parse_args()
-    if arguments.mode == 'eval' and arguments.run_name is None:
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+    elif arguments.mode == 'eval' and arguments.run_name is None:
         parser.error('The --run-name argument is required in eval mode')
     kwargs = vars(arguments)
     mode = kwargs.pop('mode', 'train')
-    exit(main(mode, **kwargs))  # todo fix not implemented error
+    exit(main(mode, **kwargs))
