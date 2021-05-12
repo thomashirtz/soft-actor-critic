@@ -107,7 +107,6 @@ optional arguments:
   --record              Toggle the recording of the episodes (toggling "record" would also toggle "render")
 ```
 
-
 ## Equations
 
 This is an attempt to show the equation of the paper, and their correspondence in the source code:
@@ -182,8 +181,6 @@ def _entropy_optimization(self, state: torch.Tensor) -> float:
 
 ```
 
-
-
 ## Resources
 
 List of repository that helped me to solve technical issues:
@@ -192,11 +189,6 @@ List of repository that helped me to solve technical issues:
 - [spinningup](https://github.com/openai/spinningup) 
 
 Equations made with [this](https://jsfiddle.net/8ndx694g/) tool, taken from [this](https://gist.github.com/VictorNS69/1c952045825eac1b5e4d9fc84ad9d384) thread.
-
-## Original papers:
-
-Soft Actor-Critic Algorithms and Applications, Haarnoja et al. [[arxiv]](https://arxiv.org/abs/1812.05905v2) (January 2019)   
-Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor, Haarnoja et al. [[arxiv]](https://arxiv.org/abs/1801.01290) (January 2018)
 
 ## License
 ```
@@ -214,3 +206,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+## Original papers:
+
+Soft Actor-Critic Algorithms and Applications, Haarnoja et al. [[arxiv]](https://arxiv.org/abs/1812.05905v2) (January 2019)   
+Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor, Haarnoja et al. [[arxiv]](https://arxiv.org/abs/1801.01290) (January 2018)
