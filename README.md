@@ -1,7 +1,7 @@
 # soft-actor-critic
-
+<img align="right" width="400"  src="lunar_lander.gif"> 
 Implementation of the soft actor critic algorithm using Pytorch. Code kept as lean and clean
-as possible on purpose. <img align="right" width="350"  src="lunar_lander.gif"> 
+as possible on purpose. 
 
 ## Usage
 
@@ -106,7 +106,11 @@ optional arguments:
 
 This is an attempt to show the equation of the paper, and their correspondence in the source code:
 
-### Critic network Optimization
+### Critic Optimization
+
+[Equation 6:](https://arxiv.org/pdf/1812.05905v2.pdf)  
+
+<img src="https://render.githubusercontent.com/render/math?math=%5Chat%7B%5Cnabla%7D_%7B%5Ctheta%7D%20J_%7BQ%7D(%5Ctheta)%3D%5Cnabla_%7B%5Ctheta%7D%20Q_%7B%5Ctheta%7D%5Cleft(%5Cmathbf%7Ba%7D_%7Bt%7D%2C%20%5Cmathbf%7Bs%7D_%7Bt%7D%5Cright)%5Cleft(Q_%7B%5Ctheta%7D%5Cleft(%5Cmathbf%7Bs%7D_%7Bt%7D%2C%20%5Cmathbf%7Ba%7D_%7Bt%7D%5Cright)-%5Cleft(r%5Cleft(%5Cmathbf%7Bs%7D_%7Bt%7D%2C%20%5Cmathbf%7Ba%7D_%7Bt%7D%5Cright)%2B%5Cgamma%5Cleft(Q_%7B%5Cbar%7B%5Ctheta%7D%7D%5Cleft(%5Cmathbf%7Bs%7D_%7Bt%2B1%7D%2C%20%5Cmathbf%7Ba%7D_%7Bt%2B1%7D%5Cright)-%5Calpha%20%5Clog%20%5Cleft(%5Cpi_%7B%5Cphi%7D%5Cleft(%5Cmathbf%7Ba%7D_%7Bt%2B1%7D%20%5Cmid%20%5Cmathbf%7Bs%7D_%7Bt%2B1%7D%5Cright)%5Cright)%5Cright)%5Cright)%5Cright.">
 
 ```python
 def _critic_optimization(self, state: torch.Tensor, action: torch.Tensor, reward: torch.Tensor,
@@ -131,6 +135,10 @@ def _critic_optimization(self, state: torch.Tensor, action: torch.Tensor, reward
 
 ### Policy Optimization 
 
+[Equation 10:](https://arxiv.org/pdf/1812.05905v2.pdf)  
+
+<img src="https://render.githubusercontent.com/render/math?math=%5Chat%7B%5Cnabla%7D_%7B%5Cphi%7D%20J_%7B%5Cpi%7D(%5Cphi)%3D%5Cnabla_%7B%5Cphi%7D%20%5Calpha%20%5Clog%20%5Cleft(%5Cpi_%7B%5Cphi%7D%5Cleft(%5Cmathbf%7Ba%7D_%7Bt%7D%20%5Cmid%20%5Cmathbf%7Bs%7D_%7Bt%7D%5Cright)%5Cright)%2B%5Cleft(%5Cnabla_%7B%5Cmathbf%7Ba%7D_%7Bt%7D%7D%20%5Calpha%20%5Clog%20%5Cleft(%5Cpi_%7B%5Cphi%7D%5Cleft(%5Cmathbf%7Ba%7D_%7Bt%7D%20%5Cmid%20%5Cmathbf%7Bs%7D_%7Bt%7D%5Cright)%5Cright)-%5Cnabla_%7B%5Cmathbf%7Ba%7D_%7Bt%7D%7D%20Q%5Cleft(%5Cmathbf%7Bs%7D_%7Bt%7D%2C%20%5Cmathbf%7Ba%7D_%7Bt%7D%5Cright)%5Cright)%20%5Cnabla_%7B%5Cphi%7D%20f_%7B%5Cphi%7D%5Cleft(%5Cepsilon_%7Bt%7D%20%3B%20%5Cmathbf%7Bs%7D_%7Bt%7D%5Cright)">
+
 ```python
 def _policy_optimization(self, state: torch.Tensor) -> float:
     with eval_mode(self.critic):
@@ -148,6 +156,10 @@ def _policy_optimization(self, state: torch.Tensor) -> float:
 ```
 
 ### Entropy Optimization 
+
+[Equation 17:](https://arxiv.org/pdf/1812.05905v2.pdf)  
+
+<img src="https://render.githubusercontent.com/render/math?math=%5Calpha_%7Bt%7D%5E%7B*%7D%3D%5Carg%20%5Cmin%20_%7B%5Calpha_%7Bt%7D%7D%20%5Cmathbb%7BE%7D_%7B%5Cmathbf%7Ba%7D_%7Bt%7D%20%5Csim%20%5Cpi_%7Bt%7D%5E%7B*%7D%7D%5Cleft%5B-%5Calpha_%7Bt%7D%20%5Clog%20%5Cpi_%7Bt%7D%5E%7B*%7D%5Cleft(%5Cmathbf%7Ba%7D_%7Bt%7D%20%5Cmid%20%5Cmathbf%7Bs%7D_%7Bt%7D%20%3B%20%5Calpha_%7Bt%7D%5Cright)-%5Calpha_%7Bt%7D%20%5Coverline%7B%5Cmathcal%7BH%7D%7D%5Cright%5D">
 
 ```python
 def _entropy_optimization(self, state: torch.Tensor) -> float:
@@ -172,6 +184,8 @@ List of repository that helped me to solve technical issues:
 - [pytorch-soft-actor-critic](https://github.com/pranz24/pytorch-soft-actor-critic) 
 - [Soft-Actor-Critic-and-Extensions](https://github.com/BY571/Soft-Actor-Critic-and-Extensions) 
 - [spinningup](https://github.com/openai/spinningup) 
+
+Equations made with [this](https://jsfiddle.net/8ndx694g/) tool, taken from [this](https://gist.github.com/VictorNS69/1c952045825eac1b5e4d9fc84ad9d384) thread.
 
 ## Original papers:
 
