@@ -8,3 +8,4 @@
 /.tox
 /venv*
 /.idea
+/runs/
