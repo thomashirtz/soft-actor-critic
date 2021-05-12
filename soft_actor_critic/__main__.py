@@ -37,7 +37,7 @@ def get_parser(formatter_class=argparse.RawTextHelpFormatter):
     # train parser
     parser_train = subparsers.add_parser(
         "train", parents=[parent_parser],
-        help='Create something'
+        help='Train an agent'
     )
     parser_train.add_argument(
         '--run-name', default=None, type=str, metavar='',
