@@ -197,3 +197,7 @@ Equations made with [this](https://jsfiddle.net/8ndx694g/) tool, taken from [thi
 
 Soft Actor-Critic Algorithms and Applications, Haarnoja et al. [[arxiv]](https://arxiv.org/abs/1812.05905v2) (January 2019)   
 Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor, Haarnoja et al. [[arxiv]](https://arxiv.org/abs/1801.01290) (January 2018)
+
+## License
+
+Copyright 2021 Thomas Hirtz
