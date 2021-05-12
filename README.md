@@ -33,7 +33,9 @@ python3 soft_actor_critic eval --run-name name_of_my_last_run --hidden-units 512
 
 ```
 python soft_actor_critic --help
-
+```
+Output:
+```
 usage: Use "python soft_actor_critic --help" for more information
 
 PyTorch Soft Actor-Critic
@@ -51,7 +53,9 @@ optional arguments:
 
 ```
 python soft_actor_critic train --help
-
+```
+Output:
+```
 usage: Use "python soft_actor_critic --help" for more information train [-h] [--env-name] [--hidden-units  [...]]
                                                                         [--directory] [--seed] [--run-name]
                                                                         [--batch-size] [--memory-size]
@@ -81,7 +85,9 @@ optional arguments:
 
 ```
 python soft_actor_critic eval --help
-
+```
+Output:
+```
 usage: Use "python soft_actor_critic --help" for more information eval [-h] [--env-name] [--hidden-units  [...]]
                                                                        [--directory] [--seed] [--run-name]
                                                                        [--num-episodes] [--deterministic] [--render]
