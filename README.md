@@ -33,14 +33,16 @@ python3 soft_actor_critic eval --run-name name_of_my_last_run --hidden-units 512
 
 ```
 python soft_actor_critic --help
-
+```
+Output:
+```
 usage: Use "python soft_actor_critic --help" for more information
 
 PyTorch Soft Actor-Critic
 
 positional arguments:
   {train,eval}  Selection of the mode to perform
-    train       Create something
+    train       Train an agent
     eval        Evaluate the performance of an already trained agent
 
 optional arguments:
@@ -51,7 +53,9 @@ optional arguments:
 
 ```
 python soft_actor_critic train --help
-
+```
+Output:
+```
 usage: Use "python soft_actor_critic --help" for more information train [-h] [--env-name] [--hidden-units  [...]]
                                                                         [--directory] [--seed] [--run-name]
                                                                         [--batch-size] [--memory-size]
@@ -81,7 +85,9 @@ optional arguments:
 
 ```
 python soft_actor_critic eval --help
-
+```
+Output:
+```
 usage: Use "python soft_actor_critic --help" for more information eval [-h] [--env-name] [--hidden-units  [...]]
                                                                        [--directory] [--seed] [--run-name]
                                                                        [--num-episodes] [--deterministic] [--render]
@@ -100,7 +106,6 @@ optional arguments:
   --render              Toggle the rendering of the episodes
   --record              Toggle the recording of the episodes (toggling "record" would also toggle "render")
 ```
-
 
 ## Equations
 
@@ -176,8 +181,6 @@ def _entropy_optimization(self, state: torch.Tensor) -> float:
 
 ```
 
-
-
 ## Resources
 
 List of repository that helped me to solve technical issues:
@@ -186,6 +189,23 @@ List of repository that helped me to solve technical issues:
 - [spinningup](https://github.com/openai/spinningup) 
 
 Equations made with [this](https://jsfiddle.net/8ndx694g/) tool, taken from [this](https://gist.github.com/VictorNS69/1c952045825eac1b5e4d9fc84ad9d384) thread.
+
+## License
+```
+Copyright 2021 Thomas Hirtz
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
 
 ## Original papers:
 
