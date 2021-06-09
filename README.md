@@ -19,7 +19,7 @@ python3 soft_actor_critic train --env-name MountainCarContinuous-v0 --learning-r
 ### Eval
 
 ```
-python3 soft_actor_critic eval --run-name name_of_my_last_run
+python3 soft_actor_critic eval --run-name "name_of_my_last_run"
 ```
 
 With some arguments:
