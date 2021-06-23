@@ -19,7 +19,7 @@ python3 soft_actor_critic train --env-name MountainCarContinuous-v0 --learning-r
 ### Eval
 
 ```
-python3 soft_actor_critic eval --run-name name_of_my_last_run
+python3 soft_actor_critic eval --run-name "name_of_my_last_run"
 ```
 
 With some arguments:
@@ -189,23 +189,6 @@ List of repository that helped me to solve technical issues:
 - [spinningup](https://github.com/openai/spinningup) 
 
 Equations made with [this](https://jsfiddle.net/8ndx694g/) tool, taken from [this](https://gist.github.com/VictorNS69/1c952045825eac1b5e4d9fc84ad9d384) thread.
-
-## License
-```
-Copyright 2021 Thomas Hirtz
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
 
 ## Original papers:
 
